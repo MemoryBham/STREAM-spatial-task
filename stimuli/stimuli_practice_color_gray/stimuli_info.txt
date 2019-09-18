@@ -1,0 +1,17 @@
+item_ID	item_name	file_name	cat_exemplar	cat_perc_1	cat_perc_2	cat_sem_1	cat_sem_2	label_exemplar	label_perc_1	label_perc_2	label_sem_1	label_sem_2
+1	chihuahua_photo_color	1_Dog_Chihuahua_photo_color.jpg	1	1	1	1	1	chihuahua	photograph	color	living	non-flying
+2	hummingbird_photo_color	2_Bird_Hummingbird_photo_color.jpg	2	1	1	1	2	hummingbird	photograph	color	living	flying
+3	sportscar_photo_color	3_Vehicle_Sportscar_photo_color.jpg	3	1	1	2	1	sportscar	photograph	color	non-living	non-flying
+4	hotairballoon_photo_color	4_Aircraft_HotAirBalloon_photo_color.jpg	4	1	1	2	2	hot air balloon	photograph	color	non-living	flying
+5	chihuahua_drawing_color	1_Dog_Chihuahua_drawing_color.jpg	1	2	1	1	1	chihuahua	drawing	color	living	non-flying
+6	hummingbird_drawing_color	2_Bird_Hummingbird_drawing_color.jpg	2	2	1	1	2	hummingbird	drawing	color	living	flying
+7	sportscar_drawing_color	3_Vehicle_Sportscar_drawing_color.jpg	3	2	1	2	1	sportscar	drawing	color	non-living	non-flying
+8	hotairballoon_drawing_color	4_Aircraft_HotAirBalloon_drawing_color.jpg	4	2	1	2	2	hot air balloon	drawing	color	non-living	flying
+9	chihuahua_photo_gray	1_Dog_Chihuahua_photo_gray.jpg	1	1	2	1	1	chihuahua	photograph	black/white	living	non-flying
+10	hummingbird_photo_gray	2_Bird_Hummingbird_photo_gray.jpg	2	1	2	1	2	hummingbird	photograph	black/white	living	flying
+11	sportscar_photo_gray	3_Vehicle_Sportscar_photo_gray.jpg	3	1	2	2	1	sportscar	photograph	black/white	non-living	non-flying
+12	hotairballoon_photo_gray	4_Aircraft_HotAirBalloon_photo_gray.jpg	4	1	2	2	2	hot air balloon	photograph	black/white	non-living	flying
+13	chihuahua_drawing_gray	1_Dog_Chihuahua_drawing_gray.jpg	1	2	2	1	1	chihuahua	drawing	black/white	living	non-flying
+14	hummingbird_drawing_gray	2_Bird_Hummingbird_drawing_gray.jpg	2	2	2	1	2	hummingbird	drawing	black/white	living	flying
+15	sportscar_drawing_gray	3_Vehicle_Sportscar_drawing_gray.jpg	3	2	2	2	1	sportscar	drawing	black/white	non-living	non-flying
+16	hotairballoon_drawing_gray	4_Aircraft_HotAirBalloon_drawing_gray.jpg	4	2	2	2	2	hot air balloon	drawing	black/white	non-living	flying

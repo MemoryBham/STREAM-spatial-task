@@ -1,0 +1,65 @@
+item_ID	item_name	file_name	cat_exemplar	cat_perc_1	cat_perc_2	cat_sem_1	cat_sem_2	label_exemplar	label_perc_1	label_perc_2	label_sem_1	label_sem_2
+1	stbernard_photo_color	1_Dog_StBernardDog_photo_color.jpg	1	1	1	1	1	st bernard dog	photograph	color	living	non-flying
+2	frenchbulldog_photo_color	1_Dog_FrenchBulldog_photo_color.jpg	1	1	1	1	1	french bulldog	photograph	color	living	non-flying
+3	germanshepherd_photo_color	1_Dog_GermanShepherd_photo_color.jpg	1	1	1	1	1	german shepherd	photograph	color	living	non-flying
+4	goldenretriever_photo_color	1_Dog_GoldenRetriever_photo_color.jpg	1	1	1	1	1	golden retriever	photograph	color	living	non-flying
+5	owl_photo_color	2_Bird_Owl_photo_color.jpg	2	1	1	1	2	owl	photograph	color	living	flying
+6	parrot_photo_color	2_Bird_Parrot_photo_color.jpg	2	1	1	1	2	parrot	photograph	color	living	flying
+7	pigeon_photo_color	2_Bird_Pigeon_photo_color.jpg	2	1	1	1	2	pigeon	photograph	color	living	flying
+8	stork_photo_color	2_Bird_Stork_photo_color.jpg	2	1	1	1	2	stork	photograph	color	living	flying
+9	f1car_photo_color	3_Vehicle_F1car_photo_color.jpg	3	1	1	2	1	formula-1 car	photograph	color	non-living	non-flying
+10	minicooper_photo_color	3_Vehicle_MiniCooper_photo_color.jpg	3	1	1	2	1	mini cooper	photograph	color	non-living	non-flying
+11	pickuptruck_photo_color	3_Vehicle_PickupTruck_photo_color.jpg	3	1	1	2	1	pickup truck	photograph	color	non-living	non-flying
+12	campervan_photo_color	3_Vehicle_Campervan_photo_color.jpg	3	1	1	2	1	campervan	photograph	color	non-living	non-flying
+13	passengerjet_photo_color	4_Aircraft_Boeing_photo_color.jpg	4	1	1	2	2	passenger jet	photograph	color	non-living	flying
+14	fighterjet_photo_color	4_Aircraft_FighterJet_photo_color.jpg	4	1	1	2	2	fighter jet	photograph	color	non-living	flying
+15	helicopter_photo_color	4_Aircraft_Helicopter_photo_color.jpg	4	1	1	2	2	helicopter	photograph	color	non-living	flying
+16	propellerplane_photo_color	4_Aircraft_PropellerPlane_photo_color.jpg	4	1	1	2	2	propeller plane	photograph	color	non-living	flying
+17	stbernard_drawing_color	1_Dog_StBernardDog_drawing_color.jpg	1	2	1	1	1	st bernard dog	drawing	color	living	non-flying
+18	frenchbulldog_drawing_color	1_Dog_FrenchBulldog_drawing_color.jpg	1	2	1	1	1	french bulldog	drawing	color	living	non-flying
+19	germanshepherd_drawing_color	1_Dog_GermanShepherd_drawing_colorjpg	1	2	1	1	1	german shepherd	drawing	color	living	non-flying
+20	goldenretriever_drawing_color	1_Dog_GoldenRetriever_drawing_color.jpg	1	2	1	1	1	golden retriever	drawing	color	living	non-flying
+21	owl_drawing_color	2_Bird_Owl_drawing_color.jpg	2	2	1	1	2	owl	drawing	color	living	flying
+22	parrot_drawing_color	2_Bird_Parrot_drawing_color.jpg	2	2	1	1	2	parrot	drawing	color	living	flying
+23	pigeon_drawing_color	2_Bird_Pigeon_drawing_color.jpg	2	2	1	1	2	pigeon	drawing	color	living	flying
+24	stork_drawing_color	2_Bird_Stork_drawing_color.jpg	2	2	1	1	2	stork	drawing	color	living	flying
+25	f1car_drawing_color	3_Vehicle_F1car_drawing_color.jpg	3	2	1	2	1	formula-1 car	drawing	color	non-living	non-flying
+26	minicooper_drawing_color	3_Vehicle_MiniCooper_drawing_color.jpg	3	2	1	2	1	mini cooper	drawing	color	non-living	non-flying
+27	pickuptruck_drawing_color	3_Vehicle_PickupTruck_drawing_color.jpg	3	2	1	2	1	pickup truck	drawing	color	non-living	non-flying
+28	campervan_drawing_color	3_Vehicle_Campervan_drawing_color.jpg	3	2	1	2	1	campervan	drawing	color	non-living	non-flying
+29	passengerjet_drawing_color	4_Aircraft_Boeing_drawing_color.jpg	4	2	1	2	2	passenger jet	drawing	color	non-living	flying
+30	fighterjet_drawing_color	4_Aircraft_FighterJet_drawing_color.jpg	4	2	1	2	2	fighter jet	drawing	color	non-living	flying
+31	helicopter_drawing_color	4_Aircraft_Helicopter_drawing_color.jpg	4	2	1	2	2	helicopter	drawing	color	non-living	flying
+32	propellerplane_drawing_color	4_Aircraft_PropellerPlane_drawing_color.jpg	4	2	1	2	2	propeller plane	drawing	color	non-living	flying
+33	stbernard_photo_gray	1_Dog_StBernardDog_photo_gray.jpg	1	1	2	1	1	st bernard dog	photograph	black/white	living	non-flying
+34	frenchbulldog_photo_gray	1_Dog_FrenchBulldog_photo_gray.jpg	1	1	2	1	1	french bulldog	photograph	black/white	living	non-flying
+35	germanshepherd_photo_gray	1_Dog_GermanShepherd_photo_gray.jpg	1	1	2	1	1	german shepherd	photograph	black/white	living	non-flying
+36	goldenretriever_photo_gray	1_Dog_GoldenRetriever_photo_gray.jpg	1	1	2	1	1	golden retriever	photograph	black/white	living	non-flying
+37	owl_photo_gray	2_Bird_Owl_photo_gray.jpg	2	1	2	1	2	owl	photograph	black/white	living	flying
+38	parrot_photo_gray	2_Bird_Parrot_photo_gray.jpg	2	1	2	1	2	parrot	photograph	black/white	living	flying
+39	pigeon_photo_gray	2_Bird_Pigeon_photo_gray.jpg	2	1	2	1	2	pigeon	photograph	black/white	living	flying
+40	stork_photo_gray	2_Bird_Stork_photo_gray.jpg	2	1	2	1	2	stork	photograph	black/white	living	flying
+41	f1car_photo_gray	3_Vehicle_F1car_photo_gray.jpg	3	1	2	2	1	formula-1 car	photograph	black/white	non-living	non-flying
+42	minicooper_photo_gray	3_Vehicle_MiniCooper_photo_gray.jpg	3	1	2	2	1	mini cooper	photograph	black/white	non-living	non-flying
+43	pickuptruck_photo_gray	3_Vehicle_PickupTruck_photo_gray.jpg	3	1	2	2	1	pickup truck	photograph	black/white	non-living	non-flying
+44	campervan_photo_gray	3_Vehicle_Campervan_photo_gray.jpg	3	1	2	2	1	campervan	photograph	black/white	non-living	non-flying
+45	passengerjet_photo_gray	4_Aircraft_Boeing_photo_gray.jpg	4	1	2	2	2	passenger jet	photograph	black/white	non-living	flying
+46	fighterjet_photo_gray	4_Aircraft_FighterJet_photo_gray.jpg	4	1	2	2	2	fighter jet	photograph	black/white	non-living	flying
+47	helicopter_photo_gray	4_Aircraft_Helicopter_photo_gray.jpg	4	1	2	2	2	helicopter	photograph	black/white	non-living	flying
+48	propellerplane_photo_gray	4_Aircraft_PropellerPlane_photo_gray.jpg	4	1	2	2	2	propeller plane	photograph	black/white	non-living	flying
+49	stbernard_drawing_gray	1_Dog_StBernardDog_drawing_gray.jpg	1	2	2	1	1	st bernard dog	drawing	black/white	living	non-flying
+50	frenchbulldog_drawing_gray	1_Dog_FrenchBulldog_drawing_gray.jpg	1	2	2	1	1	french bulldog	drawing	black/white	living	non-flying
+51	germanshepherd_drawing_gray	1_Dog_GermanShepherd_drawing_gray.jpg	1	2	2	1	1	german shepherd	drawing	black/white	living	non-flying
+52	goldenretriever_drawing_gray	1_Dog_GoldenRetriever_drawing_gray.jpg	1	2	2	1	1	golden retriever	drawing	black/white	living	non-flying
+53	owl_drawing_gray	2_Bird_Owl_drawing_gray.jpg	2	2	2	1	2	owl	drawing	black/white	living	flying
+54	parrot_drawing_gray	2_Bird_Parrot_drawing_gray.jpg	2	2	2	1	2	parrot	drawing	black/white	living	flying
+55	pigeon_drawing_gray	2_Bird_Pigeon_drawing_gray.jpg	2	2	2	1	2	pigeon	drawing	black/white	living	flying
+56	stork_drawing_gray	2_Bird_Stork_drawing_gray.jpg	2	2	2	1	2	stork	drawing	black/white	living	flying
+57	f1car_drawing_gray	3_Vehicle_F1car_drawing_gray.jpg	3	2	2	2	1	formula-1 car	drawing	black/white	non-living	non-flying
+58	minicooper_drawing_gray	3_Vehicle_MiniCooper_drawing_gray.jpg	3	2	2	2	1	mini cooper	drawing	black/white	non-living	non-flying
+59	pickuptruck_drawing_gray	3_Vehicle_PickupTruck_drawing_gray.jpg	3	2	2	2	1	pickup truck	drawing	black/white	non-living	non-flying
+60	campervan_drawing_gray	3_Vehicle_Campervan_drawing_gray.jpg	3	2	2	2	1	campervan	drawing	black/white	non-living	non-flying
+61	passengerjet_drawing_gray	4_Aircraft_Boeing_drawing_gray.jpg	4	2	2	2	2	passenger jet	drawing	black/white	non-living	flying
+62	fighterjet_drawing_gray	4_Aircraft_FighterJet_drawing_gray.jpg	4	2	2	2	2	fighter jet	drawing	black/white	non-living	flying
+63	helicopter_drawing_gray	4_Aircraft_Helicopter_drawing_gray.jpg	4	2	2	2	2	helicopter	drawing	black/white	non-living	flying
+64	propellerplane_drawing_gray	4_Aircraft_PropellerPlane_drawing_gray.jpg	4	2	2	2	2	propeller plane	drawing	black/white	non-living	flying
