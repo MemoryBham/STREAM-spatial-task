@@ -79,7 +79,7 @@ if mod(nrep_fam, length(catch_types)) ~= 0
 end
 
 catch_positions = '[(W/3) 1;(2*W/3) 3]'; % left, right
-catch_y = 'H/2+R+100';
+catch_y = 'H-(H/2-R)/2';%'H/2+R+100';
 
 %% keyboard inputs
 

@@ -45,9 +45,9 @@ distr_duration = 20; %s
 nsessions = 1;
 
 % number of times each stimulus is shown
-nrep_fam = 5;
-nrep_enc = 6; 
-nrep_ret = 6;
+nrep_fam = 5;%20;
+nrep_enc = 0; 
+nrep_ret = 0;
 
 % number of trials between two repetitions of the same stimulus
 mindiff = 1;
@@ -82,7 +82,7 @@ if mod(nrep_fam, length(catch_types)) ~= 0
 end
 
 catch_positions = '[(W/3) 1;(2*W/3) 3]'; % left, right
-catch_y = 'H-(H/2-R)/2';%'H/2+R+200';
+catch_y = 'H-(H/2-R)/2';%
 
 %% keyboard inputs
 

@@ -8,7 +8,7 @@ rng(seed);
 
 resultsFolder = './results/';
 
-imageFolder = './stimuli/stimuli_practice_color_gray/';%'./stimuli/stimuli_practice_dogs_birds_cars_planes/';
+imageFolder = './stimuli/stimuli_dogs_birds_cars_planes/';
 
 %% timing 
 
@@ -38,31 +38,31 @@ minBreakTime = 10; %s
 retrievalTimeout = 0; %s
 
 % distractor task length
-distr_duration = 20; %s
+distr_duration = 60; %s
 
 %% trial numbers
 
 nsessions = 1;
 
 % number of times each stimulus is shown
-nrep_fam = 5;
-nrep_enc = 6; 
-nrep_ret = 6;
+nrep_fam = 25; % each question 5 times
+nrep_enc = 0; 
+nrep_ret = 0;
 
 % number of trials between two repetitions of the same stimulus
-mindiff = 1;
+mindiff = 3;
 
 % drag-and-drop
-nrep_DDtrials = 2; % number of drag-and-drop trials for each stimulus
-mindiffDD = 0; % minimum number of trials, before and after a DD trials, that cannot be a DD trial
+nrep_DDtrials = 3; % number of drag-and-drop trials for each stimulus
+mindiffDD = 1; % minimum number of trials, before and after a DD trials, that cannot be a DD trial
 
 % catch
-nrep_Ctrials = 6; % number of catch trials for each stimulus;
+nrep_Ctrials = 10; % number of catch trials for each stimulus;
 mindiffC = 0;
 
 % number of trials per block - there is a break after each block
-ntrials_block_enc = 12;
-ntrials_block_ret = 12;
+ntrials_block_enc = 16;
+ntrials_block_ret = 16;
 if ntrials_block_enc < nstim
     warning('Number of trials per encoding block is lower than the number of stimuli, the stimulus numbers will not be balanced!')
 end
@@ -82,7 +82,7 @@ if mod(nrep_fam, length(catch_types)) ~= 0
 end
 
 catch_positions = '[(W/3) 1;(2*W/3) 3]'; % left, right
-catch_y = 'H-(H/2-R)/2';%'H/2+R+200';
+catch_y = 'H-(H/2-R)/2';%
 
 %% keyboard inputs
 

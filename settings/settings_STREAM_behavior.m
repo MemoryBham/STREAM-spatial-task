@@ -82,7 +82,7 @@ if mod(nrep_fam, length(catch_types)) ~= 0
 end
 
 catch_positions = '[(W/3) 1;(2*W/3) 3]'; % left, right
-catch_y = 'H/2+R+200';
+catch_y = 'H-(H/2-R)/2';%'H/2+R+200';
 
 %% keyboard inputs
 
@@ -103,7 +103,7 @@ RestrictKeysForKbCheck(KbCheckList);
 
 %% some layout
 
-fontsize = 30;
+fontsize = 40;
 
 % for the presentation arena
 R = 250; % radius of presentation circle, hardcoded on line 80

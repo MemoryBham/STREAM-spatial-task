@@ -1,0 +1,17 @@
+item_ID	item_name	exemplar_cat	perc_cat_1	perc_cat_2	sem_cat_1	sem_cat_2
+1	apple_1	1	1	1	1	1
+2	apple_2	1	1	1	1	2
+3	apple_3	1	1	1	2	1
+4	apple_4	1	1	1	2	2
+5	pepper_1	2	1	2	1	1
+6	pepper_2	2	1	2	1	2
+7	pepper_3	2	1	2	2	1
+8	pepper_4	2	1	2	2	2
+9	scissors_1	3	2	2	1	1
+10	scissors_2	3	2	2	1	2
+11	scissors_3	3	2	2	2	1
+12	scissors_4	3	2	2	2	2
+13	toy_1	4	2	1	1	1
+14	toy_2	4	2	1	1	2
+15	toy_3	4	2	1	2	1
+16	toy_4	4	2	1	2	2

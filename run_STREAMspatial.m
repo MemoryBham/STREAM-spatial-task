@@ -19,9 +19,9 @@ prompt = {'subject ID', 'Number of stimuli (4,8,16)',...
     'Stimulus selection (auto/rand/[numb])',...
     'Session # (1 or 2)','Show instructions (yes/no)?',...
     'Trigger type (ttl, serial or none)', 'Run as practice round (yes/no)?',...
-    'Task type (behavior/standard)'};
+    'Task type (behavioral/standard/visual)'};
 
-defaults = {'subXX','8','auto','1','yes','ttl','no','standard'};
+defaults = {'subXX','8','auto','1','yes','none','no','behavioral'};
 
 answer = inputdlg(prompt, 'Experimental Setup Information', 1, defaults);
 [subID, nstim, switch_selection, sessionID, switch_instructions, trg_type, practice, task_type] = deal(answer{:});
@@ -32,14 +32,20 @@ sessionID = str2double(sessionID);
 % get others settings
 switch_behavior = false;
 switch_standard = false;
+switch_visual = false;
 if sum(strcmp(practice, {'yes','y','Y','YES'})) % practice round
     switch_selection = 'rand';
     subID = strcat(subID, '_practice');
-    if sum(strcmp(task_type, {'behavior','behaviour','beh','BEH','Behavior','Behaviour'}))
+    if sum(strcmp(task_type, {'behavior','behaviour','behavioral','beh','BEH','Behavior','Behaviour'}))
         task_type = 'behavior';
         subID = strcat(subID, '_behavior');
         settings_STREAM_behavior_practice
         switch_behavior = true;
+    elseif sum(strcmp(task_type, {'visual','vis','VIS','Visual'}))
+        task_type = 'visual';
+        subID = strcat(subID, '_visual');
+        settings_STREAM_visual_practice
+        switch_visual = true;
     else
         task_type = 'standard';
         settings_STREAM_practice
@@ -50,11 +56,16 @@ if sum(strcmp(practice, {'yes','y','Y','YES'})) % practice round
         nstim = 4;
     end
 elseif sum(strcmp(practice, {'no','n','N','NO'})) % real session
-    if sum(strcmp(task_type, {'behavior','behaviour','beh','BEH','Behavior','Behaviour'}))
+    if sum(strcmp(task_type, {'behavior','behaviour','behavioral','beh','BEH','Behavior','Behaviour'}))
         subID = strcat(subID, '_behavior');
         task_type = 'behavior';
         settings_STREAM_behavior
         switch_behavior = true;
+    elseif sum(strcmp(task_type, {'visual','vis','VIS','Visual'}))
+        task_type = 'visual';
+        subID = strcat(subID, '_visual');
+        settings_STREAM_visual
+        switch_visual = true;
     else
         task_type = 'standard';
         settings_STREAM
@@ -71,8 +82,8 @@ if exist(['.\results\resultfile_',subID,'.txt'],'file')
     old_log = tdfread([resultsFolder '/resultfile_' num2str(subID) '.txt']);
     
     if length(old_log.sessionID)==0
+        fclose('all');
         error('Empty results file found, delete this file and start again.')
-        fclose('all')
     end
     
     % check session ID
@@ -264,6 +275,7 @@ if new_participant == 1
     save(strcat('sequences/m_sequence_familiarization_',subID,'.mat'),'sequence_familiarization');
     save(strcat('sequences/m_sequence_familiarization_',subID,'_',now,'.mat'),'sequence_familiarization');
    
+    if ~switch_visual 
     % encoding
     sequence_encoding = create_sequence_miniblocks(nstim, nrep_enc, ...
         mindiff, ntrials_block_enc, nrep_DDtrials, mindiffDD,1);
@@ -280,11 +292,14 @@ if new_participant == 1
     end
     save(strcat('sequences/m_sequence_retrieval_',subID,'.mat'),'sequence_retrieval');
     save(strcat('sequences/m_sequence_retrieval_',subID,'_',now,'.mat'),'sequence_retrieval');
+    end
 elseif new_participant == 0
     % load sequence
     load(strcat('sequences/m_sequence_familiarization_',subID,'.mat'));
+    if ~switch_visual 
     load(strcat('sequences/m_sequence_encoding_',subID,'.mat'));
     load(strcat('sequences/m_sequence_retrieval_',subID,'.mat'));
+    end
 end
 
 %% prep trigger box
@@ -425,10 +440,18 @@ SessionStart = GetSecs - ExpStart;
 
 if tr_fam<nstim*nrep_fam
     Screen('TextSize', window1, 2*fontsize);
-    if DPIswitch
-        Screen('DrawText', window1, 'FAMILIARIZATION', W/2-16*fontsize, H/2, textColor);
+    if switch_visual
+        if DPIswitch
+            Screen('DrawText', window1, 'VISUAL TASK', W/2-16*fontsize, H/2, textColor);
+        else
+            DrawFormattedText(window1, 'VISUAL TASK', 'center', H/2, textColor);
+        end
     else
-        DrawFormattedText(window1, 'FAMILIARIZATION', 'center', H/2, textColor);
+        if DPIswitch
+            Screen('DrawText', window1, 'FAMILIARIZATION', W/2-16*fontsize, H/2, textColor);
+        else
+            DrawFormattedText(window1, 'FAMILIARIZATION', 'center', H/2, textColor);
+        end
     end
     Screen('Flip', window1);
     WaitSecs(1);
@@ -512,12 +535,17 @@ for t = tr_fam:nrep_fam*nstim
     Screen('Flip', window1, tFixation + (fixationDuration + rand(1))- slack,1); %Adding between 0 and 1 second randomly to the minimum for the fixation duration
     
     % if behavioral task, show question first
-    if switch_behavior
+    if switch_behavior || switch_visual
         Screen('TextSize', window1, fontsize);
         Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
         drawCross(window1,W,H,barColor);
-        Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1) +labeloffset, catch_y, textColor);%CORRECT
-        Screen('DrawText', window1, labels{2},(rand_positions(2,1)) - xoffset(2) +labeloffset, catch_y, textColor);%LURE
+        if DPIswitch
+            Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1) +labeloffset, catch_y, textColor);%CORRECT
+            Screen('DrawText', window1, labels{2},(rand_positions(2,1)) - xoffset(2) +labeloffset, catch_y, textColor);%LURE
+        else
+            DrawFormattedText_mod(window1, labels{1},'center', catch_y,textColor,[],[],[],[],[],[],(rand_positions(1,1)));%CORRECT
+            DrawFormattedText_mod(window1, labels{2},'center', catch_y, textColor,[],[],[],[],[],[],(rand_positions(2,1)));%LURE
+        end
         
         Screen('Flip', window1,[],1);
         WaitSecs(catchTimeout);
@@ -533,7 +561,7 @@ for t = tr_fam:nrep_fam*nstim
     Screen('DrawTexture', window1, objectDisplay_1, [], pos_o);
     tdum = Screen('Flip', window1,[],1);
     FamStimStart = tdum - ExpStart;
-    if switch_behavior
+    if switch_behavior || switch_visual
         CatchStart = FamStimStart;
     end
     
@@ -545,9 +573,13 @@ for t = tr_fam:nrep_fam*nstim
         Screen('Flip',window1,slack,0);
         Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
         Screen('TextSize', window1, fontsize);
-        Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1) +labeloffset, catch_y, textColor);%CORRECT
-        Screen('DrawText', window1, labels{2},(rand_positions(2,1)) - xoffset(2) +labeloffset, catch_y, textColor);%LURE
-        
+        if DPIswitch
+            Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1) +labeloffset, catch_y, textColor);%CORRECT
+            Screen('DrawText', window1, labels{2},(rand_positions(2,1)) - xoffset(2) +labeloffset, catch_y, textColor);%LURE
+        else
+            DrawFormattedText_mod(window1, labels{1},'center', catch_y,textColor,[],[],[],[],[],[],(rand_positions(1,1)));%CORRECT
+            DrawFormattedText_mod(window1, labels{2},'center', catch_y, textColor,[],[],[],[],[],[],(rand_positions(2,1)));%LURE
+        end
         tdum = Screen('Flip', window1,[],1);
         CatchStart = tdum - ExpStart;
     end
@@ -571,24 +603,51 @@ for t = tr_fam:nrep_fam*nstim
     
     % check answer
     catch_resp = 2; % no answer
-    Screen('TextSize', window1, fontsize);
-    if rand_positions(1,1)==catch_positions(1,1) && catch_resp_key(1)==responseKeys{3}(1) %'L'
-        %             correct_responses_catch = correct_responses_catch + 1;
-        catch_resp = 1; %correct
-        Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1)+labeloffset, catch_y, barColor_Correct);%CORRECT
-    elseif rand_positions(1,1)==catch_positions(1,1) && catch_resp_key(1)==responseKeys{4}(1) %'R'
-        catch_resp = 0; %incorrect
-        Screen('DrawText', window1, labels{2},(rand_positions(2,1)) - xoffset(2)+labeloffset, catch_y, barColor_Incorrect);
-    elseif rand_positions(1,1)==catch_positions(2,1) && catch_resp_key(1)==responseKeys{4}(1) %'R'
-        %             correct_responses_catch = correct_responses_catch + 1;
-        catch_resp = 1;
-        Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1)+labeloffset, catch_y, barColor_Correct);%CORRECT
-    elseif rand_positions(1,1)==catch_positions(2,1) && catch_resp_key(1)==responseKeys{3}(1) %'L'
-        catch_resp = 0;
-        Screen('DrawText', window1, labels{2},(rand_positions(2,1)) - xoffset(2)+labeloffset, catch_y, barColor_Incorrect);
+    if switch_visual
+        catch_resp = 2; % no answer
+        Screen('TextSize', window1, fontsize);
+        if (rand_positions(1,1)==catch_positions(1,1) && catch_resp_key(1)==responseKeys{3}(1)) || (rand_positions(1,1)==catch_positions(2,1) && catch_resp_key(1)==responseKeys{4}(1))
+            catch_resp = 1; %correct
+        elseif (rand_positions(1,1)==catch_positions(1,1) && catch_resp_key(1)==responseKeys{4}(1)) || (rand_positions(1,1)==catch_positions(2,1) && catch_resp_key(1)==responseKeys{3}(1))%'R'
+            catch_resp = 0; %incorrect
+        end
+        Screen('Flip',window1,0,0);
+    else
+        Screen('TextSize', window1, fontsize);
+        if rand_positions(1,1)==catch_positions(1,1) && catch_resp_key(1)==responseKeys{3}(1) %'L'
+            %             correct_responses_catch = correct_responses_catch + 1;
+            catch_resp = 1; %correct
+            if DPIswitch
+                Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1)+labeloffset, catch_y, barColor_Correct);%CORRECT
+            else
+                DrawFormattedText_mod(window1, labels{1},'center', catch_y, barColor_Correct,[],[],[],[],[],[],(rand_positions(1,1)));%CORRECT
+            end
+        elseif rand_positions(1,1)==catch_positions(1,1) && catch_resp_key(1)==responseKeys{4}(1) %'R'
+            catch_resp = 0; %incorrect
+            if DPIswitch
+                Screen('DrawText', window1, labels{2},(rand_positions(2,1)) - xoffset(2)+labeloffset, catch_y, barColor_Incorrect);
+            else
+                DrawFormattedText_mod(window1, labels{2},'center', catch_y,barColor_Incorrect,[],[],[],[],[],[],(rand_positions(2,1)));
+            end
+        elseif rand_positions(1,1)==catch_positions(2,1) && catch_resp_key(1)==responseKeys{4}(1) %'R'
+            %             correct_responses_catch = correct_responses_catch + 1;
+            catch_resp = 1;
+            if DPIswitch
+                Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1)+labeloffset, catch_y, barColor_Correct);%CORRECT
+            else
+                DrawFormattedText_mod(window1, labels{1},'center', catch_y,barColor_Correct,[],[],[],[],[],[],(rand_positions(1,1)));
+            end
+        elseif rand_positions(1,1)==catch_positions(2,1) && catch_resp_key(1)==responseKeys{3}(1) %'L'
+            catch_resp = 0;
+            if DPIswitch
+                Screen('DrawText', window1, labels{2},(rand_positions(2,1)) - xoffset(2)+labeloffset, catch_y, barColor_Incorrect);
+            else
+                DrawFormattedText_mod(window1, labels{2},'center', catch_y,barColor_Incorrect,[],[],[],[],[],[],(rand_positions(2,1)));
+            end
+        end
+        Screen('Flip',window1,0,0);
+        WaitSecs(feedbacktimeout);
     end
-    Screen('Flip',window1,0,0);
-    WaitSecs(feedbacktimeout);
     
     % ---------- print everything to log file
     stimID = sequence_familiarization(t,1);
@@ -606,6 +665,24 @@ for t = tr_fam:nrep_fam*nstim
         [],[],catch_type,RT_familiarization,catch_resp,...
         SessionStart,FamiliarizationStart,[],[],TrialStart,[],TriggerStart,FamStimStart,...
         [],[],[], [],CatchStart,CatchRespStart);
+end
+
+if switch_visual
+    if DPIswitch
+        Screen('DrawText',window1, 'Well done!',W/2-2*50,H/4, textColor);
+    else
+        DrawFormattedText(window1, 'Well done!','center',H/4, textColor);
+    end
+    Screen('Flip',window1,1,[]);
+    
+    KbStrokeWait;
+    KbReleaseWait();
+    RestrictKeysForKbCheck([]);
+    Screen(window1,'Close');
+    fclose('all');
+    close all
+    sca;
+    return
 end
 
 %% ENCODING
@@ -710,9 +787,9 @@ for t = tr_enc:nrep_enc*nstim
         % instruction text (self paced)
         Screen('TextSize', window1, fontsize);
         if DPIswitch
-            Screen('DrawText', window1, 'Select the location of the next object. Press a key to continue...', W/2-67*fontsize/2, H/4-50, textColor);
+            Screen('DrawText', window1, 'Select the location of the next object. Press a key to continue...', W/2-67*fontsize/2, (H-R)/4, textColor);
         else
-            DrawFormattedText(window1, 'Select the location of the next object. Press a key to continue...','center',H/4-50, textColor);
+            DrawFormattedText(window1, 'Select the location of the next object. Press a key to continue...','center',(H-R)/4, textColor);
         end
         Screen('Flip',window1)
         WaitSecs(0.2);
@@ -1170,10 +1247,15 @@ for t = tr_ret:nrep_ret*nstim
         Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
         drawCross(window1,W,H,barColor);
         Screen('TextSize', window1, fontsize);
-        Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1)+labeloffset, catch_y, textColor);%CORRECT
-        Screen('DrawText',window1, '(forgotten)', W/2-100, catch_y+100, [0 0 0]);
-        Screen('DrawText', window1, labels{2},(rand_positions(2,1)) - xoffset(2)+labeloffset, catch_y, textColor);%LURE
-        
+        if DPIswitch
+            Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1)+labeloffset, catch_y, textColor);%CORRECT
+            Screen('DrawText',window1, '(forgotten)', W/2-100, catch_y+100, [0 0 0]);
+            Screen('DrawText', window1, labels{2},(rand_positions(2,1)) - xoffset(2)+labeloffset, catch_y, textColor);%LURE
+        else
+            DrawFormattedText_mod(window1, labels{1},'center', catch_y,textColor,[],[],[],[],[],[],(rand_positions(1,1)));
+            DrawFormattedText_mod(window1, labels{2},'center', catch_y,textColor,[],[],[],[],[],[],(rand_positions(2,1)));
+            DrawFormattedText(window1, '(forgotten)','center', catch_y,textColor,[],[],[],[],[],[]);
+        end
         Screen('Flip', window1,0,1);
         WaitSecs(catchTimeout);
     end
@@ -1223,14 +1305,14 @@ for t = tr_ret:nrep_ret*nstim
         end
         
         % Fill up a bar while subject keeps the image in mind
-        centeredRect = CenterRectOnPointd([0 0 barWidth barHeight], xCenter,(H/1.3));
+        centeredRect = CenterRectOnPointd([0 0 barWidth barHeight], xCenter,catch_y);
         growingsize = barWidth/(hz*retrievalTimeout);
         
         for fill = 1:hz*retrievalTimeout % fill up the bar
             Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
             drawCross(window1,W,H,barColor);
             Screen('FillRect', window1, [225 225 225], centeredRect);
-            centeredRectFill = CenterRectOnPointd([0 0 growingsize*fill barHeight], xCenter,(H/1.3));
+            centeredRectFill = CenterRectOnPointd([0 0 growingsize*fill barHeight], xCenter,catch_y);
             Screen('FillRect', window1, [200 200 200], centeredRectFill);
             %         Screen('FillRect', window1, [200 200 200], [xCenter-barWidth/2 (H/1.3)-barHeight/2 xCenter-barWidth/2+growingsize*fill (H/1.3)+barHeight/2]);%centeredRectfill);
             Screen('Flip', window1,1)
@@ -1244,9 +1326,15 @@ for t = tr_ret:nrep_ret*nstim
         
         % show labels
         Screen('TextSize', window1, fontsize);
-        Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1)+labeloffset, catch_y, textColor);%CORRECT
-        Screen('DrawText',window1, '(forgotten)', W/2-100, catch_y+100, [0 0 0]);
-        Screen('DrawText', window1, labels{2},(rand_positions(2,1)) - xoffset(2)+labeloffset, catch_y, textColor);%LURE
+        if DPIswitch
+            Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1)+labeloffset, catch_y, textColor);%CORRECT
+            Screen('DrawText',window1, '(forgotten)', W/2-100, catch_y+100, [0 0 0]);
+            Screen('DrawText', window1, labels{2},(rand_positions(2,1)) - xoffset(2)+labeloffset, catch_y, textColor);%LURE
+        else
+            DrawFormattedText_mod(window1, labels{1},'center', catch_y,textColor,[],[],[],[],[],[],(rand_positions(1,1)));
+            DrawFormattedText_mod(window1, labels{2},'center', catch_y,textColor,[],[],[],[],[],[],(rand_positions(2,1)));
+            DrawFormattedText(window1, '(forgotten)','center', catch_y,textColor,[],[],[],[],[],[]);
+        end
         
         tdum = Screen('Flip', window1);
         CatchStart = tdum - ExpStart;
@@ -1330,10 +1418,8 @@ end
 Screen('Flip',window1,1,[]);
 
 KbStrokeWait;
-
 KbReleaseWait();
 RestrictKeysForKbCheck([]);
-% fclose(outputfile);
 Screen(window1,'Close');
 fclose('all');
 close all
