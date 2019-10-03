@@ -1,5 +1,5 @@
-function [nx, ny, textbounds] = DrawFormattedText(win, tstring, sx, sy, color, wrapat, flipHorizontal, flipVertical, vSpacing, righttoleft, winRect, xoffset)
-% [nx, ny, textbounds] = DrawFormattedText(win, tstring [, sx][, sy][, color][, wrapat][, flipHorizontal][, flipVertical][, vSpacing][, righttoleft][, winRect])
+function [nx, ny, textbounds, wordbounds] = DrawFormattedText_mod(win, tstring, sx, sy, color, wrapat, flipHorizontal, flipVertical, vSpacing, righttoleft, winRect,xoffset)
+% [nx, ny, textbounds, wordbounds] = DrawFormattedText(win, tstring [, sx][, sy][, color][, wrapat][, flipHorizontal][, flipVertical][, vSpacing][, righttoleft][, winRect])
 %
 % Draws a string of text 'tstring' into Psychtoolbox window 'win'. Allows
 % some basic formatting.
@@ -95,6 +95,15 @@ function [nx, ny, textbounds] = DrawFormattedText(win, tstring, sx, sy, color, w
 % approximative, so it may give wrong results with some text fonts and
 % styles on some operating systems, depending on the various settings.
 %
+% The optional return argument 'wordbounds', if assigned in the calling
+% function, returns a n-by-4 matrix of per-word bounding boxes. Each row
+% defines a [left,top,right,bottom] rectangle with the bounding box of a
+% word in the text string, ie. row 1 = first word, row 2 = 2nd word, ...
+% white-space characters delimit single words and are not taken into
+% account, the successive words are defined by the function strtok(tstring).
+% Per word bounding boxes don't work if flipHorizontal or flipVertical is
+% requested.
+%
 % See DrawFormattedTextDemo for a usage example.
 
 % History:
@@ -125,6 +134,18 @@ function [nx, ny, textbounds] = DrawFormattedText(win, tstring, sx, sy, color, w
 % 08/08/15  Fix bug for Unicode text introduced when improving single-line text centering. (MK)
 % 02/16/16  Improve bounding box calculations for multi-line text, esp. for vSpacing > 1. (MK)
 % 03/29/16  Add sx='centerblock', always use yPosIsBaseline, update help text. (MK)
+% 08/24/16  Made vertical flip work when using FTGL plugin. (DCN)
+% 08/30/16  Fix for vertical flip is now in FTGL plugin. (DCN)
+% 02/15/17  Improve text/word vertical alignment if sy == 'centered' and horizontal
+%           justification modes (via sx) are requested. We now always use yPosIsBaseline=1
+%           and compensate for baseline accordingly. (MK)
+%           Improve use of blank space when block adjustment is used. Instead of approximation
+%           of a blanks ' ' width by the width of a 'X', use the xAdvance property of 'TextBounds'
+%           for a ' ' blank, if the text renderer supports this. Otherwise fall back to old 'X'. (MK)
+%           Implement new optional 4th return argument 'wordbounds'. If caller requests it,
+%           we calculate bounding boxes for each individual word in a string, and return a list
+%           of bounding boxes. Use case, e.g., to define ROI's around each word for eye tracking
+%           experiments. See forum message #21528 (MK).
 
 % Set ptb_drawformattedtext_disableClipping to 1 if text clipping should be disabled:
 global ptb_drawformattedtext_disableClipping;
@@ -146,9 +167,27 @@ if nargin < 1 || isempty(win)
 end
 
 if nargin < 2 || isempty(tstring)
-    % Empty text string -> Nothing to do.
+    % Empty text string -> Nothing to do, but assign dummy values:
+    [nx, ny] = Screen('DrawText', win, '');
+    textbounds = [nx, ny, nx, ny];
+    wordbounds = textbounds;
     return;
 end
+
+if IsOctave
+    % char() casts of unicode values > 255 map to zero, because Octave
+    % uses UTF-8 encoding for unicode, instead of UTF-32 as Matlab. We
+    % take care of this in the code, but necessary casts() also trigger
+    % an out-of-range warning in Octave, which we can't selectively disable,
+    % as it lacks a unique warning id (duh!). Therefore disable all warnings
+    % on Octave and reenable to previous setting whenever the we exit, and
+    % therefore the canary variable reenablewarn goes out of scope:
+    warningstate = warning('query');
+    warning('off');
+    reenablewarn = onCleanup(@() restorewarningstate(warningstate));
+end
+
+wordbounds = [];
 
 % Store data class of input string for later use in re-cast ops:
 stringclass = class(tstring);
@@ -256,6 +295,7 @@ if numlines == 1
     theight = RectHeight(Screen('TextBounds', win, tstring));
 end
 
+
 % Default y start position is top of window:
 if nargin < 4 || isempty(sy)
     % As we use y-position is baseline, need to shift it down
@@ -272,6 +312,21 @@ end
 winHeight = RectHeight(winRect);
 winWidth = RectWidth(winRect);
 
+% Need some approximation of the height to baseline. Use height of X,
+% as it usually has large/maximal ascenders, but no descenders:
+blankbounds = Screen('TextBounds', win, 'X', [], [], 1, righttoleft);
+
+% Compute width of a single blank ' ' white-space, in case we need it.
+% If the given text renderer does not support the xAdvance property, we
+% fallback to bounding box width of a 'X'. As justification only works
+% with monospaced fonts anyway, we can do this substitution with good
+% results:
+[~, ~, ~, blankwidth] = Screen('TextBounds', win, ' ', [], [], 1, righttoleft);
+if blankwidth == 0
+    blankwidth = RectWidth(blankbounds);
+end
+baselineHeight = RectHeight(blankbounds);
+
 if ischar(sy) && strcmpi(sy, 'center')
     % Compute vertical centering:
     bbox = SetRect(0,0,1,numlines * theight);
@@ -280,11 +335,16 @@ if ischar(sy) && strcmpi(sy, 'center')
     [rect,dh,dv] = CenterRect(bbox, winRect); %#ok<ASGLU>
 
     % Initialize vertical start position sy with vertical offset of
-    % centered text box:
-    sy = dv;
-    yPosIsBaseline = 0;
+    % centered text box, corrected for baselineHeight because we use
+    % yPosIsBaseline = 1:
+    sy = dv + baselineHeight;
+    yPosIsBaseline = 1;
 else
     yPosIsBaseline = 1;
+end
+
+if ~yPosIsBaseline
+    baselineHeight = 0;
 end
 
 % Keep current text color if noone provided:
@@ -308,21 +368,7 @@ end
 disableClip = (ptb_drawformattedtext_disableClipping ~= -1) && ...
               ((ptb_drawformattedtext_disableClipping > 0) || (nargout >= 3));
 
-% Need some approximation of the height to baseline:
-blankbounds = Screen('TextBounds', win, 'X', [], [], 1, righttoleft);
-if yPosIsBaseline
-    baselineHeight = RectHeight(blankbounds);
-else
-    baselineHeight = 0;
-end
-
 if bjustify
-    % Compute width of a single blank ' ' space, in case we need it. We use
-    % a 'X' instead of ' ', because with some text renderers, ' ' has an
-    % empty bounding box, so this would fail. As justification only works
-    % with monospaced fonts anyway, we can do this substitution with good
-    % results:
-    blankwidth = RectWidth(blankbounds);
     sx = winRect(RectLeft);
 end
 
@@ -423,7 +469,7 @@ while ~isempty(tstring)
             % Yes. Compute dh, dv position offsets to center it in the center of window.
             [rect,dh] = CenterRect(bbox, winRect); %#ok<ASGLU>
             % Set drawing cursor to horizontal x offset:
-            xp = dh - deltaboxX  + (xoffset - winWidth/2);
+            xp = dh - deltaboxX + (xoffset - winWidth/2);
         end
 
         % Horizontally centered output of the block containing the full text string as a whole required?
@@ -442,8 +488,13 @@ while ~isempty(tstring)
                 warning('Text justification to wrapat''th right column border not supported for flipHorizontal or flipVertical text drawing.');
             end
 
+            % Per word bounding boxes too much implementation effort atm.:
+            if nargout >= 4
+                error('Return of per-word bounding boxes ''wordbounds'' not supported for flipHorizontal or flipVertical text drawing.');
+            end
+
             textbox = OffsetRect(bbox, xp, yp);
-            [xc, yc] = RectCenter(textbox);
+            [xc, yc] = RectCenterd(textbox);
 
             % Make a backup copy of the current transformation matrix for later
             % use/restoration of default state:
@@ -487,12 +538,30 @@ while ~isempty(tstring)
                 else
                     padpergapneeded = 0;
                 end
+            else
+                padpergapneeded = 0;
+            end
 
+            % Non-zero padpergapneeded for block justification? Or per-word bounding boxes
+            % requested? Then we need to render text line word by word:
+            if nargout >= 4 || padpergapneeded > 0
                 % Render text line word by word, adding padpergapneeded pixels of blank space
-                % between consecutive words, to evenly distribute the padding space needed:
+                % between consecutive words:
+                nx = xp;
+                ny = yp;
                 [wordup, remstring] = strtok(curstring);
                 cxp = xp;
                 while ~isempty(wordup)
+                    if nargout >= 4
+                        % Caller wants per-word bounding boxes returned:
+                        [~, wordbound] = Screen('TextBounds', win, wordup, cxp, yp, yPosIsBaseline, righttoleft);
+                        wordbounds(end+1, :) = wordbound;
+                    end
+
+                    if (padpergapneeded == 0) && ~isempty(remstring)
+                        wordup = [wordup ' '];
+                    end
+
                     [nx ny] = Screen('DrawText', win, wordup, cxp, yp, color, [], yPosIsBaseline, righttoleft);
                     if ~isempty(remstring)
                         nx = nx + padpergapneeded;
@@ -501,6 +570,7 @@ while ~isempty(tstring)
                     [wordup, remstring] = strtok(remstring);
                 end
             else
+                % Fast path: Draw one full line of text.
                 [nx ny] = Screen('DrawText', win, curstring, xp, yp, color, [], yPosIsBaseline, righttoleft);
             end
         end
@@ -552,6 +622,10 @@ textbounds = SetRect(minx, miny - baselineHeight, maxx, maxy - baselineHeight);
 nx = xp;
 ny = yp;
 
+if nargout >= 4 && isempty(wordbounds)
+    wordbounds = textbounds;
+end
+
 % Our work is done. If a different window than our target window was
 % active, we'll switch back to that window and its state:
 if previouswin > 0
@@ -577,3 +651,9 @@ if previouswin > 0
 end
 
 return;
+end
+
+% Restore warning() settings to initial at onCleanup():
+function restorewarningstate(warningstate)
+    warning(warningstate);
+end

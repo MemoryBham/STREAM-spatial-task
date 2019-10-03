@@ -8,7 +8,7 @@ rng(seed);
 
 resultsFolder = './results/';
 
-imageFolder = './stimuli/stimuli_dogs_birds_cars_planes/';
+imageFolder = './stimuli/stimuli_color_gray/';%'./stimuli/stimuli_dogs_birds_cars_planes/';
 
 %% timing 
 

@@ -21,7 +21,7 @@ prompt = {'subject ID', 'Number of stimuli (4,8,16)',...
     'Trigger type (ttl, serial or none)', 'Run as practice round (yes/no)?',...
     'Task type (behavioral/standard/visual)'};
 
-defaults = {'subXX','8','auto','1','yes','none','no','behavioral'};
+defaults = {'subXX','8','auto','1','yes','ttl','no','standard'};
 
 answer = inputdlg(prompt, 'Experimental Setup Information', 1, defaults);
 [subID, nstim, switch_selection, sessionID, switch_instructions, trg_type, practice, task_type] = deal(answer{:});
@@ -1249,12 +1249,12 @@ for t = tr_ret:nrep_ret*nstim
         Screen('TextSize', window1, fontsize);
         if DPIswitch
             Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1)+labeloffset, catch_y, textColor);%CORRECT
-            Screen('DrawText',window1, '(forgotten)', W/2-100, catch_y+100, [0 0 0]);
+            Screen('DrawText',window1, '(forgotten)', W/2-100, catch_y+fontsize, [0 0 0]);
             Screen('DrawText', window1, labels{2},(rand_positions(2,1)) - xoffset(2)+labeloffset, catch_y, textColor);%LURE
         else
             DrawFormattedText_mod(window1, labels{1},'center', catch_y,textColor,[],[],[],[],[],[],(rand_positions(1,1)));
             DrawFormattedText_mod(window1, labels{2},'center', catch_y,textColor,[],[],[],[],[],[],(rand_positions(2,1)));
-            DrawFormattedText(window1, '(forgotten)','center', catch_y,textColor,[],[],[],[],[],[]);
+            DrawFormattedText(window1, '(forgotten)','center', catch_y+fontsize,textColor,[],[],[],[],[],[]);
         end
         Screen('Flip', window1,0,1);
         WaitSecs(catchTimeout);
@@ -1328,12 +1328,12 @@ for t = tr_ret:nrep_ret*nstim
         Screen('TextSize', window1, fontsize);
         if DPIswitch
             Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1)+labeloffset, catch_y, textColor);%CORRECT
-            Screen('DrawText',window1, '(forgotten)', W/2-100, catch_y+100, [0 0 0]);
+            Screen('DrawText',window1, '(forgotten)', W/2-100, catch_y+fontsize, [0 0 0]);
             Screen('DrawText', window1, labels{2},(rand_positions(2,1)) - xoffset(2)+labeloffset, catch_y, textColor);%LURE
         else
             DrawFormattedText_mod(window1, labels{1},'center', catch_y,textColor,[],[],[],[],[],[],(rand_positions(1,1)));
             DrawFormattedText_mod(window1, labels{2},'center', catch_y,textColor,[],[],[],[],[],[],(rand_positions(2,1)));
-            DrawFormattedText(window1, '(forgotten)','center', catch_y,textColor,[],[],[],[],[],[]);
+            DrawFormattedText(window1, '(forgotten)','center', catch_y+fontsize,textColor,[],[],[],[],[],[]);
         end
         
         tdum = Screen('Flip', window1);
