@@ -17,7 +17,7 @@ item_ID	item_name	file_name	cat_exemplar	cat_perc_1	cat_perc_2	cat_sem_1	cat_sem
 16	propellerplane_photo_color	4_Aircraft_PropellerPlane_photo_color.jpg	4	1	1	2	2	propeller plane	photograph	color	non-living	flying
 17	stbernard_drawing_color	1_Dog_StBernardDog_drawing_color.jpg	1	2	1	1	1	st bernard dog	drawing	color	living	non-flying
 18	frenchbulldog_drawing_color	1_Dog_FrenchBulldog_drawing_color.jpg	1	2	1	1	1	french bulldog	drawing	color	living	non-flying
-19	germanshepherd_drawing_color	1_Dog_GermanShepherd_drawing_colorjpg	1	2	1	1	1	german shepherd	drawing	color	living	non-flying
+19	germanshepherd_drawing_color	1_Dog_GermanShepherd_drawing_color.jpg	1	2	1	1	1	german shepherd	drawing	color	living	non-flying
 20	goldenretriever_drawing_color	1_Dog_GoldenRetriever_drawing_color.jpg	1	2	1	1	1	golden retriever	drawing	color	living	non-flying
 21	owl_drawing_color	2_Bird_Owl_drawing_color.jpg	2	2	1	1	2	owl	drawing	color	living	flying
 22	parrot_drawing_color	2_Bird_Parrot_drawing_color.jpg	2	2	1	1	2	parrot	drawing	color	living	flying

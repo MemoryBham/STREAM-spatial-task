@@ -1,7 +1,7 @@
 
 clear all
 
-DPIswitch = 0;
+DPIswitch = 0; % 0 for normal screens
 
 %% the preliminaries
 
@@ -477,6 +477,12 @@ if tr_fam<nstim*nrep_fam
     KbStrokeWait;
 end
 
+% send start trigger
+for i = 1:3
+    sendTrigger(trg_type, trg_handle);
+end
+
+
 block_state = 'familiarization';
 FamiliarizationStart = GetSecs - ExpStart;
 
@@ -719,6 +725,11 @@ if tr_enc<nstim*nrep_enc
     
     Screen('Flip',window1);
     KbStrokeWait;
+end
+
+% send start trigger
+for i = 1:4
+    sendTrigger(trg_type, trg_handle);
 end
 
 block_state = 'encoding';
@@ -1170,6 +1181,11 @@ Screen('DrawTexture', window1, instrDisplay, [], pos);
 Screen('Flip',window1);
 KbStrokeWait;
 
+% send start trigger
+for i = 1:5
+    sendTrigger(trg_type, trg_handle);
+end
+
 block_state = 'retrieval';
 RetrievalStart = GetSecs - ExpStart;
 
@@ -1286,7 +1302,7 @@ for t = tr_ret:nrep_ret*nstim
     if switch_standard
         % ----------- Reinstatement response
         waitForResponse = true;
-        while waitForResponse || GetSecs - (CueStart+ExpStart) < cueTimeout+rand(1)
+        while waitForResponse %|| GetSecs - (CueStart+ExpStart) < cueTimeout+rand(1)
             [~,tdum,keyCode] = KbCheck;
             RetReinstStart = tdum - ExpStart;
             
