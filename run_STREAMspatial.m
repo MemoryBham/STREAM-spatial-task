@@ -1,4 +1,4 @@
-
+function run_STREAMspatial()
 clear all
 
 DPIswitch = 0; % 0 for normal screens
@@ -18,7 +18,7 @@ now = datestr(datetime('now'), 'dd-mmm-yyyy_HH.MM');
 prompt = {'subject ID', 'Number of stimuli (4,8,16)',...
     'Stimulus selection (auto/rand/[numb])',...
     'Session # (1 or 2)','Show instructions (yes/no)?',...
-    'Trigger type (ttl, serial or none)', 'Run as practice round (yes/no)?',...
+    'Trigger type (ttl, serial, labjack or none)', 'Run as practice round (yes/no)?',...
     'Task type (behavioral/standard/visual)'};
 
 defaults = {'subXX','8','auto','1','yes','ttl','no','standard'};
@@ -178,7 +178,7 @@ Screen('Flip', window1);
 
 if new_participant
     % get image info from
-    stimuli_info = readtable(strcat(imageFolder, '/stimuli_info.txt'));
+    stimuli_info = readtable(strcat(imageFolder, '/stimuli_info.txt'), 'Delimiter', 'tab');
     
     if sum(strcmp(switch_selection, {'rand', 'random'}))
         % assign stimuli to two sessions
@@ -312,6 +312,10 @@ elseif strcmp(trg_type, 'ttl')
     trg_handle  = DaqDeviceIndex;
     err = DaqDConfigPort(trg_handle,[],0);
     out_ = DaqDOut(trg_handle,0,0); % reset
+elseif sum(strcmp(trg_type, {'lab','labjack'}))
+    trg_type = 'labjack';
+    lab_init;
+    trg_handle = L;
 else
     trg_handle = [];
 end
@@ -535,7 +539,7 @@ for t = tr_fam:nrep_fam*nstim
     
     
     % ---------- Show fixation cross + arena
-    Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+    Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
     drawCross(window1,W,H,barColor);
     tFixation = Screen('Flip', window1,[],1); % use 1 here to allow addition of the location!
     Screen('Flip', window1, tFixation + (fixationDuration + rand(1))- slack,1); %Adding between 0 and 1 second randomly to the minimum for the fixation duration
@@ -543,7 +547,7 @@ for t = tr_fam:nrep_fam*nstim
     % if behavioral task, show question first
     if switch_behavior || switch_visual
         Screen('TextSize', window1, fontsize);
-        Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+        Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
         drawCross(window1,W,H,barColor);
         if DPIswitch
             Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1) +labeloffset, catch_y, textColor);%CORRECT
@@ -562,7 +566,7 @@ for t = tr_fam:nrep_fam*nstim
     sendTrigger(trg_type, trg_handle);
     
     % ------ show stimulus
-%     Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+%     Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
 %     Screen('Flip', window1,0.5,1);
     Screen('DrawTexture', window1, objectDisplay_1, [], pos_o);
     tdum = Screen('Flip', window1,[],1);
@@ -577,7 +581,7 @@ for t = tr_fam:nrep_fam*nstim
         
         % ------ show question after object
         Screen('Flip',window1,slack,0);
-        Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+        Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
         Screen('TextSize', window1, fontsize);
         if DPIswitch
             Screen('DrawText', window1, labels{1},(rand_positions(1,1)) - xoffset(1) +labeloffset, catch_y, textColor);%CORRECT
@@ -792,7 +796,7 @@ for t = tr_enc:nrep_enc*nstim
         Priority(MaxPriority(window1));
         Priority(2);
         
-        Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+        Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
         Screen('Flip', window1,[],1);
         
         % instruction text (self paced)
@@ -811,7 +815,7 @@ for t = tr_enc:nrep_enc*nstim
         sendTrigger(trg_type, trg_handle)
         
         % show object
-        Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+        Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
 %         Screen('Flip', window1,0.5,1);
         Screen('DrawTexture', window1, objectDisplay_1, [], pos_o);
         tdum = Screen('Flip', window1,[],0); % Start of drag & drop trial
@@ -839,7 +843,7 @@ for t = tr_enc:nrep_enc*nstim
         clear keyCode
         
         % show locations
-        Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+        Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
         Screen('DrawDots', window1, stimuli_info.positions', dotsize, black, [], []);
         % Screen('Flip',window1,[],1);
         
@@ -865,7 +869,7 @@ for t = tr_enc:nrep_enc*nstim
                 else
                     new_loc = cur_loc-1;
                 end
-                Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+                Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
                 Screen('DrawDots', window1, cue_positions', dotsize, black, [], []);
                 Screen('FillOval', window1, barColorDD,[(cue_positions(new_loc,1)-2*dotsize) (cue_positions(new_loc,2)-2*dotsize) (cue_positions(new_loc,1)+2*dotsize) (cue_positions(new_loc,2)+2*dotsize)]);
                 Screen('Flip',window1,[],0);
@@ -877,7 +881,7 @@ for t = tr_enc:nrep_enc*nstim
                 else
                     new_loc = cur_loc+1;
                 end
-                Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+                Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
                 Screen('DrawDots', window1, stimuli_info.positions', dotsize, black, [], []);
                 Screen('FillOval', window1, barColorDD,[(cue_positions(new_loc,1)-2*dotsize) (cue_positions(new_loc,2)-2*dotsize) (cue_positions(new_loc,1)+2*dotsize) (cue_positions(new_loc,2)+2*dotsize)]);
                 Screen('Flip',window1,[],0);
@@ -888,7 +892,7 @@ for t = tr_enc:nrep_enc*nstim
                 % check answer and give feedback
                 if sum((cue_positions(cur_loc,:) - stimuli_info.positions(sequence_encoding(t,1),:))==0) == 2
                     % correct
-                    Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+                    Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
                     Screen('DrawDots', window1, stimuli_info.positions', dotsize, black, [], []);
                     Screen('FillOval', window1, barColor_Correct,[(cue_positions(cur_loc,1)-2*dotsize) (cue_positions(cur_loc,2)-2*dotsize) (cue_positions(cur_loc,1)+2*dotsize) (cue_positions(cur_loc,2)+2*dotsize)]);
                     feedbackStart = Screen('Flip',window1,[],1);
@@ -898,7 +902,7 @@ for t = tr_enc:nrep_enc*nstim
                     contDD = false;
                 else
                     % incorrect
-                    Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+                    Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
                     Screen('DrawDots', window1, stimuli_info.positions', dotsize, black, [], []);
                     Screen('FillOval', window1, barColor_Incorrect,[(cue_positions(cur_loc,1)-2*dotsize) (cue_positions(cur_loc,2)-2*dotsize) (cue_positions(cur_loc,1)+2*dotsize) (cue_positions(cur_loc,2)+2*dotsize)]);
                     Screen('Flip',window1,[],0);
@@ -910,7 +914,7 @@ for t = tr_enc:nrep_enc*nstim
         end
         
         % instructions
-        %         Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+        %         Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
         %         Screen('Flip', window1,[],1);
         %         Screen('TextSize', window1, 20);
         %         DrawFormattedText(window1, 'Well done!','center',H/5, black);
@@ -926,7 +930,7 @@ for t = tr_enc:nrep_enc*nstim
         Priority(2);
         
         % ---------- Show fixation cross + arena
-        Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+        Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
         Screen('DrawDots', window1, stimuli_info.positions', dotsize, black, [], []);
         drawCross(window1,W,H,barColor);
         tFixation = Screen('Flip', window1,[],1); % use 1 here to allow addition of the location!
@@ -955,7 +959,7 @@ for t = tr_enc:nrep_enc*nstim
         Priority(2);
         
         % -------- Show fixation cross
-        Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+        Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
         drawCross(window1,W,H,barColor);
         tFixation = Screen('Flip', window1,[],1);
         Screen('Flip', window1, tFixation + (fixationDuration)- slack,0);
@@ -965,7 +969,7 @@ for t = tr_enc:nrep_enc*nstim
         sendTrigger(trg_type, trg_handle)
         
         % -------- Show Object
-        Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+        Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
         Screen('DrawTexture', window1, objectDisplay_1, [], pos_o);
         tdum = Screen('Flip', window1); % Start of trial
         StimStart = tdum - ExpStart;
@@ -989,7 +993,7 @@ for t = tr_enc:nrep_enc*nstim
     end
     
     % --------- inter trial interval
-    Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+    Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
     ITIStart = Screen('Flip', window1);
     
     while GetSecs - ITIStart < postobjectTimeout
@@ -1260,7 +1264,7 @@ for t = tr_ret:nrep_ret*nstim
         % ask catch question before reinstatement
         
         % show labels
-        Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+        Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
         drawCross(window1,W,H,barColor);
         Screen('TextSize', window1, fontsize);
         if DPIswitch
@@ -1277,7 +1281,7 @@ for t = tr_ret:nrep_ret*nstim
     end
     
     % ---------- Show fixation cross + arena
-    Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+    Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
     Screen('DrawDots', window1, stimuli_info.positions', dotsize, black, [], []);
     drawCross(window1,W,H,barColor);
     tFixation = Screen('Flip', window1,[],1); % use 1 here to allow addition of the location!
@@ -1325,7 +1329,7 @@ for t = tr_ret:nrep_ret*nstim
         growingsize = barWidth/(hz*retrievalTimeout);
         
         for fill = 1:hz*retrievalTimeout % fill up the bar
-            Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+            Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
             drawCross(window1,W,H,barColor);
             Screen('FillRect', window1, [225 225 225], centeredRect);
             centeredRectFill = CenterRectOnPointd([0 0 growingsize*fill barHeight], xCenter,catch_y);
@@ -1390,7 +1394,7 @@ for t = tr_ret:nrep_ret*nstim
         end
         
         % --------- inter trial interval
-        Screen('FillOval', window1, white, [W/2-R H/2-R W/2+R H/2+R], []);
+        Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
         ITIStart = Screen('Flip', window1);
         
         while GetSecs - ITIStart < postobjectTimeout
@@ -1442,6 +1446,7 @@ close all
 sca;
 return
 
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Subfunctions
