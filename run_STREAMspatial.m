@@ -848,7 +848,8 @@ for t = tr_enc:nrep_enc*nstim
         % Screen('Flip',window1,[],1);
         
         % start at random location
-        correct_loc = find(sum((cue_positions - stimuli_info.positions(sequence_encoding(t,1),:))==0,2) == 2);
+        correct_loc = find(sum([(cue_positions(:,1) - stimuli_info.positions(sequence_encoding(t,1),1))==0,...
+            (cue_positions(:,2) - stimuli_info.positions(sequence_encoding(t,1),2))==0],2) == 2);
         start_locs = cue_positions(setdiff(1:nstim,correct_loc),:);
         rand_loc = randi(nstim-1,1);
         Screen('FillOval', window1, barColorDD,[(start_locs(rand_loc,1)-2*dotsize) (start_locs(rand_loc,2)-2*dotsize) (start_locs(rand_loc,1)+2*dotsize) (start_locs(rand_loc,2)+2*dotsize)]);
