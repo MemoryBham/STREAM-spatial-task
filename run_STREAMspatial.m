@@ -17,11 +17,11 @@ now = datestr(datetime('now'), 'dd-mmm-yyyy_HH.MM');
 % Open a Prompt Window
 prompt = {'subject ID', 'Number of stimuli (4,8,16)',...
     'Stimulus selection (auto/rand/[numb])',...
-    'Session # (1 or 2)','Show instructions (yes/no)?',...
+    'Session # (1, 2 or 3)','Show instructions (yes/no)?',...
     'Trigger type (ttl, serial, labjack or none)', 'Run as practice round (yes/no)?',...
     'Task type (behavioral/standard/visual)'};
 
-defaults = {'subXX','8','auto','1','yes','ttl','no','standard'};
+defaults = {'subXX','8','rand','1','yes','ttl','no','standard'};
 
 answer = inputdlg(prompt, 'Experimental Setup Information', 1, defaults);
 [subID, nstim, switch_selection, sessionID, switch_instructions, trg_type, practice, task_type] = deal(answer{:});
@@ -70,6 +70,9 @@ elseif sum(strcmp(practice, {'no','n','N','NO'})) % real session
         task_type = 'standard';
         settings_STREAM
         switch_standard = true;
+    end
+    if sessionID == 3
+        settings_retest
     end
 end
 
@@ -169,7 +172,7 @@ W=rect(RectRight); % screen width
 H=rect(RectBottom); % screen
 
 catch_positions = eval(catch_positions);
-catch_y = eval(catch_y); 
+catch_y = eval(catch_y);
 
 Screen(window1,'FillRect',backgroundColor);
 Screen('Flip', window1);
@@ -246,8 +249,14 @@ else % load existing
     load(['./sequences/stim_info_',subID,'.mat'])
 end
 
+% normal session or delayed retest?
+if sessionID == 3
+    stim_session = ismember(stimuli_info.session, [1,2]);
+else
+    stim_session = stimuli_info.session == sessionID;
+end
+
 % take only the stimuli for this session
-stim_session = stimuli_info.session == sessionID;
 stimuli_info = stimuli_info(stim_session,:);
 
 % take only the locations for this session
@@ -264,41 +273,55 @@ imgList = stimuli_info.file_name;
 
 %% get sequences of stimuli
 
-if new_participant == 1
-    % familiarization
-    sequence_familiarization = create_sequence_miniblocks(nstim, nrep_fam, ...
-        mindiff, nstim*nrep_fam, nrep_fam, 0,0);
-    % assign catch question types
-    for s = 1:nstim
-        sequence_familiarization(sequence_familiarization(:,1)==s,2) = randperm(nrep_fam);
-    end
-    save(strcat('sequences/m_sequence_familiarization_',subID,'.mat'),'sequence_familiarization');
-    save(strcat('sequences/m_sequence_familiarization_',subID,'_',now,'.mat'),'sequence_familiarization');
-   
-    if ~switch_visual 
-    % encoding
-    sequence_encoding = create_sequence_miniblocks(nstim, nrep_enc, ...
-        mindiff, ntrials_block_enc, nrep_DDtrials, mindiffDD,1);
-    save(strcat('sequences/m_sequence_encoding_',subID,'.mat'),'sequence_encoding');
-    save(strcat('sequences/m_sequence_encoding_',subID,'_',now,'.mat'),'sequence_encoding');
+if new_participant == 1 || old_session ~= sessionID
     
-    % retrieval
-    sequence_retrieval = create_sequence_miniblocks(nstim, nrep_ret, ...
-        mindiff, ntrials_block_ret, nrep_Ctrials, mindiffC,0);
-    % assign catch question types
-    for s = 1:nstim
-        sequence_retrieval(sequence_retrieval(:,1)==s & sequence_retrieval(:,2) == 1,2) = ...
-            randperm(nrep_Ctrials);
+    if nrep_fam > 0
+        % familiarization
+        sequence_familiarization = create_sequence_miniblocks(nstim, nrep_fam, ...
+            mindiff, nstim*nrep_fam, nrep_fam, 0,0);
+        % assign catch question types
+        for s = 1:nstim
+            sequence_familiarization(sequence_familiarization(:,1)==s,2) = randperm(nrep_fam);
+        end
+        save(strcat('sequences/m_sequence_familiarization_',subID,'.mat'),'sequence_familiarization');
+        save(strcat('sequences/m_sequence_familiarization_',subID,'_',now,'.mat'),'sequence_familiarization');
     end
-    save(strcat('sequences/m_sequence_retrieval_',subID,'.mat'),'sequence_retrieval');
-    save(strcat('sequences/m_sequence_retrieval_',subID,'_',now,'.mat'),'sequence_retrieval');
+    
+    if ~switch_visual
+        
+        if nrep_enc > 0
+            % encoding
+            sequence_encoding = create_sequence_miniblocks(nstim, nrep_enc, ...
+                mindiff, ntrials_block_enc, nrep_DDtrials, mindiffDD,1);
+            save(strcat('sequences/m_sequence_encoding_',subID,'.mat'),'sequence_encoding');
+            save(strcat('sequences/m_sequence_encoding_',subID,'_',now,'.mat'),'sequence_encoding');
+        end
+        
+        if nrep_ret > 0
+            % retrieval
+            sequence_retrieval = create_sequence_miniblocks(nstim, nrep_ret, ...
+                mindiff, ntrials_block_ret, nrep_Ctrials, mindiffC,0);
+            % assign catch question types
+            for s = 1:nstim
+                sequence_retrieval(sequence_retrieval(:,1)==s & sequence_retrieval(:,2) == 1,2) = ...
+                    randperm(nrep_Ctrials);
+            end
+            save(strcat('sequences/m_sequence_retrieval_',subID,'.mat'),'sequence_retrieval');
+            save(strcat('sequences/m_sequence_retrieval_',subID,'_',now,'.mat'),'sequence_retrieval');
+        end
     end
 elseif new_participant == 0
     % load sequence
+    if nrep_fam>0
     load(strcat('sequences/m_sequence_familiarization_',subID,'.mat'));
-    if ~switch_visual 
-    load(strcat('sequences/m_sequence_encoding_',subID,'.mat'));
-    load(strcat('sequences/m_sequence_retrieval_',subID,'.mat'));
+    end
+    if ~switch_visual
+        if nrep_enc>0
+            load(strcat('sequences/m_sequence_encoding_',subID,'.mat'));
+        end
+        if nrep_ret>0
+            load(strcat('sequences/m_sequence_retrieval_',subID,'.mat'));
+        end
     end
 end
 
@@ -566,8 +589,8 @@ for t = tr_fam:nrep_fam*nstim
     sendTrigger(trg_type, trg_handle);
     
     % ------ show stimulus
-%     Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
-%     Screen('Flip', window1,0.5,1);
+    %     Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
+    %     Screen('Flip', window1,0.5,1);
     Screen('DrawTexture', window1, objectDisplay_1, [], pos_o);
     tdum = Screen('Flip', window1,[],1);
     FamStimStart = tdum - ExpStart;
@@ -759,7 +782,7 @@ for t = tr_enc:nrep_enc*nstim
         
         for fill = 1:hz*minBreakTime % fill up the bar
             if DPIswitch
-            Screen('DrawText', window1, 'Time for a mini break!', W/2-22*fontsize/2, H/3, textColor);
+                Screen('DrawText', window1, 'Time for a mini break!', W/2-22*fontsize/2, H/3, textColor);
             else
                 DrawFormattedText(window1, 'Time for a mini break!', 'center', H/3, textColor);
             end
@@ -816,7 +839,7 @@ for t = tr_enc:nrep_enc*nstim
         
         % show object
         Screen('FillOval', window1, [255,255,255], [W/2-R H/2-R W/2+R H/2+R], []);
-%         Screen('Flip', window1,0.5,1);
+        %         Screen('Flip', window1,0.5,1);
         Screen('DrawTexture', window1, objectDisplay_1, [], pos_o);
         tdum = Screen('Flip', window1,[],0); % Start of drag & drop trial
         DaDStimStart = tdum - ExpStart;
@@ -1026,7 +1049,7 @@ end
 
 %% DISTRACTOR
 
-if tr_ret == 1
+if tr_ret == 1 && distr_duration > 0
     Screen('TextSize', window1, 2*fontsize);
     if DPIswitch
         Screen('DrawText', window1, 'NUMBER TASK', W/2-18*fontsize, H/2, textColor);
@@ -1158,7 +1181,7 @@ Screen('TextSize', window1, 2*fontsize);
 if DPIswitch
     Screen('DrawText',window1, 'RETRIEVAL',W/2-10*fontsize,H/2, textColor);
 else
-   DrawFormattedText(window1, 'RETRIEVAL','center',H/2, textColor);
+    DrawFormattedText(window1, 'RETRIEVAL','center',H/2, textColor);
 end
 Screen('Flip',window1);
 WaitSecs(1);
@@ -1275,7 +1298,7 @@ for t = tr_ret:nrep_ret*nstim
         else
             DrawFormattedText_mod(window1, labels{1},'center', catch_y,textColor,[],[],[],[],[],[],(rand_positions(1,1)));
             DrawFormattedText_mod(window1, labels{2},'center', catch_y,textColor,[],[],[],[],[],[],(rand_positions(2,1)));
-            DrawFormattedText(window1, '(forgotten)','center', catch_y+fontsize,textColor,[],[],[],[],[],[]);
+            DrawFormattedText(window1, '(forgotten)','center', catch_y+2*fontsize,textColor,[],[],[],[],[],[]);
         end
         Screen('Flip', window1,0,1);
         WaitSecs(catchTimeout);
@@ -1354,7 +1377,7 @@ for t = tr_ret:nrep_ret*nstim
         else
             DrawFormattedText_mod(window1, labels{1},'center', catch_y,textColor,[],[],[],[],[],[],(rand_positions(1,1)));
             DrawFormattedText_mod(window1, labels{2},'center', catch_y,textColor,[],[],[],[],[],[],(rand_positions(2,1)));
-            DrawFormattedText(window1, '(forgotten)','center', catch_y+fontsize,textColor,[],[],[],[],[],[]);
+            DrawFormattedText(window1, '(forgotten)','center', catch_y+2*fontsize,textColor,[],[],[],[],[],[]);
         end
         
         tdum = Screen('Flip', window1);
