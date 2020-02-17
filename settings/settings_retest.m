@@ -1,7 +1,7 @@
 % settings_retest
 
-nstim = 2*nstim;
-nsessions = 1;
+% nstim = 2*nstim;
+% nsessions = 1;
 
 distr_duration = 0;
 retrievalTimeout = 0; %s
@@ -20,7 +20,7 @@ nrep_Ctrials = 10; % number of catch trials for each stimulus;
 mindiffC = 0;
 
 % number of trials per block - there is a break after each block
-ntrials_block_ret = 32;
+ntrials_block_ret = 40;
 if ntrials_block_ret < nstim
     warning('Number of trials per retrieval block is lower than the number of stimuli, the stimulus numbers will not be balanced!')
 end

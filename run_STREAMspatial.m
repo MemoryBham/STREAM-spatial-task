@@ -17,7 +17,7 @@ now = datestr(datetime('now'), 'dd-mmm-yyyy_HH.MM');
 % Open a Prompt Window
 prompt = {'subject ID', 'Number of stimuli (4,8,16)',...
     'Stimulus selection (auto/rand/[numb])',...
-    'Session # (1, 2 or 3)','Show instructions (yes/no)?',...
+    'Session # (1, 2, 3 or 4)','Show instructions (yes/no)?',...
     'Trigger type (ttl, serial, labjack or none)', 'Run as practice round (yes/no)?',...
     'Task type (behavioral/standard/visual)'};
 
@@ -71,7 +71,7 @@ elseif sum(strcmp(practice, {'no','n','N','NO'})) % real session
         settings_STREAM
         switch_standard = true;
     end
-    if sessionID == 3
+    if sessionID == 3 || sessionID == 4
         settings_retest
     end
 end
@@ -251,7 +251,9 @@ end
 
 % normal session or delayed retest?
 if sessionID == 3
-    stim_session = ismember(stimuli_info.session, [1,2]);
+    stim_session = ismember(stimuli_info.session, 1);
+elseif sessionID == 4
+    stim_session = ismember(stimuli_info.session, 2);
 else
     stim_session = stimuli_info.session == sessionID;
 end
@@ -1187,8 +1189,11 @@ Screen('Flip',window1);
 WaitSecs(1);
 
 % load instructions
-instr_object = imread(strcat('./instructions/instructions_',task_type,'/reminder_retrieval.jpg'));
-
+if sessionID <3
+    instr_object = imread(strcat('./instructions/instructions_',task_type,'/reminder_retrieval.jpg'));
+else
+    instr_object = imread(strcat('./instructions/instructions_',task_type,'/reminder_retest.jpg'));
+end
 instrDisplay = Screen('MakeTexture', window1, instr_object);
 
 % Calculate image position (center of the screen)
