@@ -57,13 +57,17 @@ if sum(strcmp(practice, {'yes','y','Y','YES'})) % practice round
     end
 elseif sum(strcmp(practice, {'no','n','N','NO'})) % real session
     if sum(strcmp(task_type, {'behavior','behaviour','behavioral','beh','BEH','Behavior','Behaviour'}))
-        subID = strcat(subID, '_behavior');
+        if sessionID ~= 3 && sessionID ~= 4
+            subID = strcat(subID, '_behavior');
+        end
         task_type = 'behavior';
         settings_STREAM_behavior
         switch_behavior = true;
     elseif sum(strcmp(task_type, {'visual','vis','VIS','Visual'}))
         task_type = 'visual';
-        subID = strcat(subID, '_visual');
+        if sessionID ~= 3 && sessionID ~= 4
+            subID = strcat(subID, '_visual');
+        end
         settings_STREAM_visual
         switch_visual = true;
     else
@@ -82,7 +86,7 @@ save(['./settings/settings_',subID,'_',now,'.mat'])
 
 if exist(['.\results\resultfile_',subID,'.txt'],'file')
     % load existing log
-    old_log = tdfread([resultsFolder '/resultfile_' num2str(subID) '.txt']);
+    old_log = tdfread([resultsFolder '/resultfile_' subID '.txt']);
     
     if length(old_log.sessionID)==0
         fclose('all');
