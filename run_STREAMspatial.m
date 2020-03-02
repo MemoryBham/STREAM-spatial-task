@@ -974,14 +974,15 @@ for t = tr_enc:nrep_enc*nstim
         tdum = Screen('Flip', window1); % Start of trial
         CueStart = tdum - ExpStart;
         
-        while GetSecs - (CueStart+ExpStart) < cueTimeout+rand(1)
-            [keyIsDown,secs,keyCode] = KbCheck;
-            
-            % check for quit key press
-            if keyCode(KbName(stopKey{1}))
-                quitTask; return
-            end
-        end
+%         while GetSecs - (CueStart+ExpStart) < cueTimeout+rand(1)
+%             [keyIsDown,secs,keyCode] = KbCheck;
+%             
+%             % check for quit key press
+%             if keyCode(KbName(stopKey{1}))
+%                 quitTask; return
+%             end
+%         end
+        WaitSecs(cueTimeout+rand(1))
         
         % ------- Show OBJECTs
         % Screen priority
